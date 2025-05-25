@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 """
-video_tools.py — utilities to list video files, take periodic snapshots from a video, and OCR those snapshots.
+video_ocr.py — utilities to list video files, take periodic snapshots from a video, and OCR those snapshots.
 
 Dependencies:
   - Python: pip install opencv-python pillow pytesseract
   - External: You also need the Tesseract binary installed
+
+Flags:
+  --video <file>     Process a single video file (mutually exclusive with --dir).
+  --dir <path>       Process **all** recognised videos in the directory.
+  --list             Only list the matching video files; no processing.
+  --snapshots        Extract snapshots from each video.
+  --ocr              Run OCR on the extracted snapshots.
+  --interval <sec>   Seconds between snapshots (default 30).
+  --lang <codes>     Tesseract language codes, e.g. "eng+fra" (default "eng").
 
 Usage examples:
   # 1. List videos in current dir
@@ -22,13 +31,10 @@ Usage examples:
   # 5. Generate snapshots *and* OCR them (30-second cadence)
   python video_ocr.py --dir ~/Movies --snapshots --ocr --interval 30 --lang eng+spa
 """
-import argparse
-import re
-import cv2
+import argparse, re, cv2, pytesseract
 from pathlib import Path
 from typing import Iterable, List
 from PIL import Image
-import pytesseract
 
 VIDEO_EXTENSIONS: set[str] = {".mp4", ".mov", ".avi", ".mkv", ".flv", ".wmv", ".webm"}
 DEFAULT_INTERVAL = 30  # seconds
@@ -74,12 +80,11 @@ def extract_snapshots(video_path: Path, interval_seconds: int = DEFAULT_INTERVAL
     cap.release()
     return out_dir
 
-
 def _iter_snapshots(snapshot_dir: Path) -> Iterable[Path]:
     """Yield snapshot paths in natural (numeric) order."""
     snapshots = sorted(snapshot_dir.glob("snapshot_*.jpg"))
     # Natural sort by the numeric part to avoid 10 < 2 issues
-    key = lambda p: int(re.search(r"(\d+)(?=\.jpg$)", p.name).group(1))
+    key = lambda p: int(re.search(r"(\d+)(?=\.jpg$)", p.name).group(1)) # type: ignore
     return sorted(snapshots, key=key)
 
 def ocr_snapshots(video_path: Path, snapshot_dir: Path | None = None, *, lang: str = "eng") -> Path:
@@ -166,4 +171,3 @@ def _cli() -> None:
 
 if __name__ == "__main__":
     _cli()
-

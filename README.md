@@ -1,5 +1,5 @@
 # Video Slides OCR
-This is a small command-line tool to help take periodic snapshots from a video lecture and OCR those snapshots. Typical uses include skimming long lectures, and generating thumbnails and transcripts for recorded meetings.
+This is a small command-line tool to help take periodic snapshots from a video lecture and OCR those snapshots. Typical uses include skimming long lectures, and generating thumbnails & transcripts for recorded meetings.
 
 This automates three everyday video‑processing chores:
 
@@ -23,22 +23,33 @@ choco install tesseract-ocr
 ```
 
 ### Python packages
-```bash
+```
 pip install opencv-python pillow pytesseract 
+```
+
+## CLI Flags
+Flags:
+```
+  --video <file>     Process a single video file (mutually exclusive with --dir).
+  --dir <path>       Process **all** recognised videos in the directory.
+  --list             Only list the matching video files; no processing.
+  --snapshots        Extract snapshots from each video.
+  --ocr              Run OCR on the extracted snapshots.
+  --interval <sec>   Seconds between snapshots (default 30).
+  --lang <codes>     Tesseract language codes, e.g. "eng+fra" (default "eng").
 ```
 
 ## Usage cheat‑sheet
 
-> All commands are executed from the directory that holds your video(s).
-
 | Goal | Command |
 | --- | --- |
-| List videos | `python video_tools.py --list` |
-| **1 shot/min** from *demo.mp4* | `python video_tools.py --video demo.mp4 --snapshots` |
-| **30 s interval** | `python video_tools.py --video demo.mp4 --snapshots --interval 30` |
-| OCR existing snapshots | `python video_tools.py --video demo.mp4 --ocr` |
-| Extract **and** OCR in one go | `python video_tools.py --video demo.mp4 --snapshots --ocr` |
-| Multilingual OCR (English + French) | `python video_tools.py --video demo.mp4 --snapshots --ocr --lang eng+fra` |
+| List videos | `python video_ocr.py --list` |
+| One shot per min from demo.mp4 | `python video_ocr.py --video demo.mp4 --snapshots` |
+| 30 seconds interval | `python video_ocr.py --video demo.mp4 --snapshots --interval 30` |
+| OCR existing snapshots | `python video_ocr.py --video demo.mp4 --ocr` |
+| Extract and OCR in one go | `python video_ocr.py --video demo.mp4 --snapshots --ocr` |
+| Multilingual OCR (English + French) | `python video_ocr.py --video demo.mp4 --snapshots --ocr --lang eng+fra` |
+| Process every video in the given directory | `python video_ocr.py --dir ./mydirectory --snapshots --ocr` |
 
 ### Output structure
 
@@ -59,12 +70,6 @@ Each text block inside **demo_ocr.txt** is prefixed so you know which snapshot i
 Recognized text goes here…
 ```
 
-## Customisation
-
-* **Supported extensions** — edit the `VIDEO_EXTENSIONS` set in the script to add more formats.
-* **Snapshot cadence** — change the default `DEFAULT_INTERVAL = 30` (seconds).
-* **Output naming** — tweak `SNAP_NAME_TEMPLATE` if you prefer a different pattern.
-
 ## Troubleshooting
 * **`RuntimeError: Unable to open <file>`**  →  Check the file path and verify OpenCV supports the codec.
 * **OCR empty/garbled**  →  Ensure the video actually contains readable text at the snapshot interval; try `--interval 15` for more frames or specify the right `--lang` codes.
@@ -72,10 +77,10 @@ Recognized text goes here…
 ## Usage Examples
 ```
 # Generate snapshots + OCR them in one go (default 30-s cadence)
-python video_tools.py --video lecture.mp4 --snapshots --ocr
+python video_ocr.py --video lecture.mp4 --snapshots --ocr
 
 # Already have snapshots? Just OCR them (English + Spanish recognition)
-python video_tools.py --video lecture.mp4 --ocr --lang eng+spa
+python video_ocr.py --video lecture.mp4 --ocr --lang eng+spa
 ```
 
 ## License
