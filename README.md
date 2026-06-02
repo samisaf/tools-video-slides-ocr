@@ -23,8 +23,16 @@ choco install tesseract-ocr
 ```
 
 ### Python packages
+Using standard `pip`:
+```bash
+pip install opencv-python pillow pytesseract python-pptx numpy
 ```
-pip install opencv-python pillow pytesseract 
+
+Or using `uv` (recommended):
+```bash
+# uv will automatically set up the environment and run scripts
+uv run video_ocr.py ...
+uv run slides_to_pptx.py ...
 ```
 
 ## CLI Flags
@@ -70,6 +78,37 @@ Each text block inside **demo_ocr.txt** is prefixed so you know which snapshot i
 Recognized text goes here…
 ```
 
+## Compiling Slides to PowerPoint (.pptx)
+
+Once snapshots and OCR text files are generated via `video_ocr.py`, you can compile them into a highly polished, widescreen PowerPoint presentation (`.pptx`) using `slides_to_pptx.py`.
+
+This tool automatically:
+1. **Removes Redundancies**: Compares adjacent frames using **Mean Squared Error (MSE)** and collapses duplicate transition frames, keeping only the final fully-built states.
+2. **Crops Canvas**: Extracts slide frames cleanly (removing the presenter's video feed and black letterbox bars).
+3. **Applies Hybrid Layouts**: 
+   - **Side-by-Side**: Places crisp native text on the left, and the cropped slide graphic on the right.
+   - **Full Figure**: Centers large visual-only slides (such as system console layouts or medical diagrams) with custom titles.
+
+### PowerPoint CLI Flags
+```
+  --video <file>        Compile slide deck for a single video file or OCR text file.
+  --dir <path>          Batch-scan a folder to process ALL matching slide OCR outputs.
+  --mse <float>         MSE threshold for duplicate slide detection (default: 50.0).
+  --crop <left,t,r,b>   Custom crop coordinates for the slide canvas (default: 2,16,591,347).
+```
+
+### PowerPoint Usage Examples
+```bash
+# Compile a slide deck for a single video's snapshots & text
+python slides_to_pptx.py --video lecture.mp4
+
+# Batch-compile PowerPoint decks for ALL processed videos in a directory
+python slides_to_pptx.py --dir ./lectures
+
+# Compile with a lower duplicate sensitivity threshold
+python slides_to_pptx.py --video lecture.mp4 --mse 25.0
+```
+
 ## Troubleshooting
 * **`RuntimeError: Unable to open <file>`**  →  Check the file path and verify OpenCV supports the codec.
 * **OCR empty/garbled**  →  Ensure the video actually contains readable text at the snapshot interval; try `--interval 15` for more frames or specify the right `--lang` codes.
@@ -85,3 +124,4 @@ python video_ocr.py --video lecture.mp4 --ocr --lang eng+spa
 
 ## License
 MIT License - © Sami Safadi
+

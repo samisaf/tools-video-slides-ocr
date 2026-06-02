@@ -1,0 +1,13 @@
+[project]
+name = "tools-video-slides-ocr"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.4.6",
+    "opencv-python>=4.13.0.92",
+    "pillow>=12.2.0",
+    "pytesseract>=0.3.13",
+    "python-pptx>=1.0.2",
+]
