@@ -35,7 +35,22 @@ uv run video_ocr.py ...
 uv run slides_to_pptx.py ...
 ```
 
+## Quick Start (Interactive Pipeline)
+To run the entire pipeline end-to-end interactively, you can run `main.py`:
+
+```bash
+python main.py
+```
+This will launch a clear, interactive prompt asking you for the directory containing your lecture videos. It will automatically resolve the directory and execute:
+1. `video_ocr.py` (to extract snapshots and run Tesseract OCR).
+2. `slides_to_pptx.py` (to clean text, deduplicate, and compile into a stunning PowerPoint presentation).
+
+All operations run back-to-back with verbose console feedback and step-by-step performance tracking.
+
+---
+
 ## CLI Flags
+### 1. Video OCR CLI (`video_ocr.py`)
 Flags:
 ```
   --video <file>     Process a single video file (mutually exclusive with --dir).
@@ -115,12 +130,18 @@ python slides_to_pptx.py --video lecture.mp4 --mse 25.0
 
 ## Usage Examples
 ```
+# Extract text and snapshots then generate slicdes
+uv run video_ocr.py --dir ~/lectures/ --snapshots --ocr
+uv run slides_to_pptx.py --dir ~/lectures/
+
 # Generate snapshots + OCR them in one go (default 30-s cadence)
 python video_ocr.py --video lecture.mp4 --snapshots --ocr
 
 # Already have snapshots? Just OCR them (English + Spanish recognition)
 python video_ocr.py --video lecture.mp4 --ocr --lang eng+spa
 ```
+
+
 
 ## License
 MIT License - © Sami Safadi
